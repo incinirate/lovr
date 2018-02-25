@@ -352,11 +352,7 @@ void lovrGraphicsSetCanvas(Canvas** canvas, int count) {
   lovrAssert(count <= MAX_CANVASES, "Attempt to simultaneously render to %d canvases (the maximum is %d)", count, MAX_CANVASES);
 
   if (state.canvasCount > 0 && state.canvas[0]->msaa > 0) {
-    int width = state.canvas[0]->texture.width;
-    int height = state.canvas[0]->texture.height;
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, state.canvas[0]->framebuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state.canvas[0]->resolveFramebuffer);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    lovrCanvasResolve(state.canvas[0], 0);
   }
 
   for (int i = 0; i < count; i++) {

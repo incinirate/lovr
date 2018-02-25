@@ -238,7 +238,7 @@ static void ensureCanvas() {
   int msaa = 0;
   glGetIntegerv(GL_SAMPLES, &msaa);
   state.system->GetRecommendedRenderTargetSize(&state.renderWidth, &state.renderHeight);
-  state.canvas = lovrCanvasCreate(state.renderWidth, state.renderHeight, FORMAT_RGB, msaa, true, true);
+  state.canvas = lovrCanvasCreate(state.renderWidth, state.renderHeight, FORMAT_RGB, msaa, true, true, true);
 }
 
 static void openvrInit() {
@@ -705,6 +705,7 @@ static void openvrRenderTo(headsetRenderCallback callback, void* userdata) {
     callback(eye, userdata);
     lovrGraphicsPop();
     lovrGraphicsPopDisplay();
+    lovrCanvasResolve(state.canvas, eye == EYE_RIGHT);
 
     // OpenVR changes the OpenGL texture binding, so we reset it after rendering
     glActiveTexture(GL_TEXTURE0);

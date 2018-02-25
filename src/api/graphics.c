@@ -882,7 +882,7 @@ int l_lovrGraphicsNewCanvas(lua_State* L) {
     return luaL_error(L, "Unsupported texture format for canvas");
   }
 
-  Canvas* canvas = lovrCanvasCreate(width, height, format, msaa, depth, stencil);
+  Canvas* canvas = lovrCanvasCreate(width, height, format, msaa, depth, stencil, false);
   luax_pushtype(L, Canvas, canvas);
   return 1;
 }

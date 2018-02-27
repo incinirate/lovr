@@ -246,7 +246,7 @@ static void ensureCanvas() {
   int msaa = 0;
   glGetIntegerv(GL_SAMPLES, &msaa);
   state.system->GetRecommendedRenderTargetSize(&state.renderWidth, &state.renderHeight);
-  state.canvas = lovrCanvasCreate(state.renderWidth, state.renderHeight, FORMAT_RGB, msaa, true, true);
+  state.canvas = lovrCanvasCreate(state.renderWidth * 2, state.renderHeight, FORMAT_RGB, msaa, true, true);
 }
 
 static bool openvrInit() {
@@ -671,7 +671,7 @@ static ModelData* openvrControllerNewModelData(Controller* controller) {
 static void openvrRenderTo(headsetRenderCallback callback, void* userdata) {
   ensureCanvas();
 
-  float head[16], transform[16], projection[16];
+  float head[16], transform[2][16], projection[2][16];
   float (*matrix)[4];
 
   state.isRendering = true;
@@ -682,16 +682,17 @@ static void openvrRenderTo(headsetRenderCallback callback, void* userdata) {
   mat4_invert(mat4_fromMat34(head, matrix));
 
   for (HeadsetEye eye = EYE_LEFT; eye <= EYE_RIGHT; eye++) {
-
-    // Eye transform
     EVREye vrEye = (eye == EYE_LEFT) ? EVREye_Eye_Left : EVREye_Eye_Right;
+
+    // Transform
     matrix = state.system->GetEyeToHeadTransform(vrEye).m;
-    mat4_invert(mat4_fromMat34(transform, matrix));
-    mat4_multiply(transform, head);
+    mat4_invert(mat4_fromMat34(transform[eye], matrix));
+    mat4_multiply(transform[eye], head);
 
     // Projection
     matrix = state.system->GetProjectionMatrix(vrEye, state.clipNear, state.clipFar).m;
-    mat4_fromMat44(projection, matrix);
+    mat4_fromMat44(projection[eye], matrix);
+  }
 
     // Render
     int viewport[4] = { 0, 0, state.canvas->texture.width, state.canvas->texture.height };
